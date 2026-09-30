@@ -67,7 +67,13 @@ test('validPutUser', async () => {
 });
 
 test('invalidPutUser', async () => {
+    const updateRes = await request(app)
+        .put(`/api/user/${testDiner.id}`)
+        .set('Authorization', `Bearer ${secondTestDiner.token}`)
+        .send({name: 'renamed diner', email: testDiner.email, password: testDiner.password});
 
+    expect(updateRes.status).toBe(403);
+    expect(updateRes.body.message).toBe('unauthorized');
 }); 
 
 test('adminPutUser', async () => {
