@@ -39,7 +39,9 @@ beforeAll(async () => {
 
 //GET /api/user/me tests
 test('validGetUser', async () => {
-
+    const getRes = await request(app).get('/api/user/me').set('Authorization', `Bearer ${testDiner.token}`);
+    expect(getRes.status).toBe(200);
+    expect(getRes.body).toMatchObject({ id: testDiner.id, name: testDiner.name, email: testDiner.email, roles: [{ role: 'diner' }] });
 });
 
 //PUT /api/user/:userId tests 
