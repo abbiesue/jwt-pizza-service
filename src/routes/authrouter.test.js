@@ -5,34 +5,40 @@ function expectValidJwt(potentialJwt) {
   expect(potentialJwt).toMatch(/^[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*$/);
 }
 
-const testUser = { name: 'pizza diner', email: 'reg@test.com', password: 'a' };
-let testUserAuthToken;
+const registeredUser = { name: 'registered diner', email: 'reg@test.com', password: 'a' };
+const unregisteredUser = { name: 'unregistered diner', email: 'unreg@test.com', password: 'b' };
+let registeredUserAuthToken;
 
 beforeAll(async () => {
-  testUser.email = Math.random().toString(36).substring(2, 12) + '@test.com';
-  const registerRes = await request(app).post('/api/auth').send(testUser);
-  testUserAuthToken = registerRes.body.token;
-  expectValidJwt(testUserAuthToken);
+  registeredUser.email = Math.random().toString(36).substring(2, 12) + '@test.com';
+  const unregisteredUser = { email: Math.random().toString(36).substring(2, 12) + '@test.com', password: 'a' };
+  const registerRes = await request(app).post('/api/auth').send(registeredUser);
+  registeredUserAuthToken = registerRes.body.token;
+  expectValidJwt(registeredUserAuthToken);
 });
 
 //PUT /api/auth tests
 test('validLogin', async () => {
-  const loginRes = await request(app).put('/api/auth').send(testUser);
+  const loginRes = await request(app).put('/api/auth').send(registeredUser);
   expect(loginRes.status).toBe(200);
   expectValidJwt(loginRes.body.token);
 
-  const expectedUser = { ...testUser, roles: [{ role: 'diner' }] };
+  const expectedUser = { ...registeredUser, roles: [{ role: 'diner' }] };
   delete expectedUser.password;
   expect(loginRes.body.user).toMatchObject(expectedUser);
 });
 
-test('unregisteredLogin', async() => {
+test('unregisteredLogin', async () => {
+  const loginRes = await request(app).put('/api/auth').send(unregisteredUser);
 
+  expect(loginRes.status).toBe(404);
+  expect(loginRes.body.message).toBe('unknown user');
+  expect(loginRes.body.token).toBeUndefined();
 });
 
 //POST /api/auth tests
-test('validResgister', async () => {
-
+test('validRegister', async () => {
+  
 });
 
 //DELETE /api/auth tests
