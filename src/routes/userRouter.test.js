@@ -77,5 +77,12 @@ test('invalidPutUser', async () => {
 }); 
 
 test('adminPutUser', async () => {
+    const updateRes = await request(app)
+        .put(`/api/user/${testDiner.id}`)
+        .set('Authorization', `Bearer ${testAdmin.token}`)
+        .send({name: 'admin renamed diner', email: testDiner.email, password: testDiner.password});
 
+    expect(updateRes.status).toBe(200); 
+    expectValidJwt(updateRes.body.token);
+    expect(updateRes.body.user).toMatchObject({ id: testDiner.id, name: 'admin renamed diner', email: testDiner.email });
 });
