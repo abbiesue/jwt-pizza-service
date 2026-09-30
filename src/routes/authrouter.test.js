@@ -1,6 +1,10 @@
 const request = require('supertest');
 const app = require('../service');
 
+function expectValidJwt(potentialJwt) {
+  expect(potentialJwt).toMatch(/^[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*$/);
+}
+
 const testUser = { name: 'pizza diner', email: 'reg@test.com', password: 'a' };
 let testUserAuthToken;
 
@@ -11,7 +15,8 @@ beforeAll(async () => {
   expectValidJwt(testUserAuthToken);
 });
 
-test('login', async () => {
+//PUT /api/auth tests
+test('validLogin', async () => {
   const loginRes = await request(app).put('/api/auth').send(testUser);
   expect(loginRes.status).toBe(200);
   expectValidJwt(loginRes.body.token);
@@ -21,6 +26,16 @@ test('login', async () => {
   expect(loginRes.body.user).toMatchObject(expectedUser);
 });
 
-function expectValidJwt(potentialJwt) {
-  expect(potentialJwt).toMatch(/^[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*$/);
-}
+test('unregisteredLogin', async() => {
+
+});
+
+//POST /api/auth tests
+test('validResgister', async () => {
+
+});
+
+//DELETE /api/auth tests
+test('validLogout', async () => {
+
+});
