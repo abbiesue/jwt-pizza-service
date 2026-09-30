@@ -31,6 +31,10 @@ async function registerUser() {
     return { ...registerRes.body.user, password: user.password, token: registerRes.body.token };
 }
 
+function expectValidJwt(potentialJwt) {
+  expect(potentialJwt).toMatch(/^[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*$/);
+}
+
 beforeAll(async () => {
     testAdmin = await createAdminUser();
     testDiner = await registerUser();
@@ -52,5 +56,20 @@ test ('getUserWithoutToken', async () => {
 
 //PUT /api/user/:userId tests 
 test('validPutUser', async () => {
+    const updateRes = await request(app)
+        .put(`/api/user/${testDiner.id}`)
+        .set('Authorization', `Bearer ${testDiner.token}`)
+        .send({name: 'renamed diner', email: testDiner.email, password: testDiner.password});
+
+    expect(updateRes.status).toBe(200); 
+    expectValidJwt(updateRes.body.token);
+    expect(updateRes.body.user).toMatchObject({ id: testDiner.id, name: 'renamed diner', email: testDiner.email });
+});
+
+test('invalidPutUser', async () => {
+
+}); 
+
+test('adminPutUser', async () => {
 
 });
