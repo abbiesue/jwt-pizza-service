@@ -44,6 +44,12 @@ test('validGetUser', async () => {
     expect(getRes.body).toMatchObject({ id: testDiner.id, name: testDiner.name, email: testDiner.email, roles: [{ role: 'diner' }] });
 });
 
+test ('getUserWithoutToken', async () => {
+    const getRes = await request(app).get('/api/user/me');
+    expect(getRes.status).toBe(401);
+    expect(getRes.body.message).toBe('unauthorized');
+});
+
 //PUT /api/user/:userId tests 
 test('validPutUser', async () => {
 
