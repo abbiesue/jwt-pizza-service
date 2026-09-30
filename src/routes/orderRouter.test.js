@@ -3,6 +3,9 @@ const app = require('../service');
 const { Role, DB } = require('../database/database.js');
 
 //global variables
+let testAdmin;
+let testDiner;
+let testMenu;
 
 //helper functions
 async function createAdminUser() {
@@ -32,6 +35,12 @@ async function registerUser() {
 function expectValidJwt(potentialJwt) {
   expect(potentialJwt).toMatch(/^[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*$/);
 }
+
+beforeAll(async () => {
+    testAdmin = await createAdminUser();
+    testDiner = await registerUser();
+    testMenu = await DB.addMenuItem({ title: randomName(), description: 'test pizza', image: 'pizza9.png', price: 0.05 });
+});
 
 //GET /api/order/menu tests
 
