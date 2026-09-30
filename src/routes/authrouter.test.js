@@ -11,7 +11,7 @@ let registeredUserAuthToken;
 
 beforeAll(async () => {
   registeredUser.email = Math.random().toString(36).substring(2, 12) + '@test.com';
-  const unregisteredUser = { email: Math.random().toString(36).substring(2, 12) + '@test.com', password: 'a' };
+  unregisteredUser.email = Math.random().toString(36).substring(2, 12) + '@test.com';
   const registerRes = await request(app).post('/api/auth').send(registeredUser);
   registeredUserAuthToken = registerRes.body.token;
   expectValidJwt(registeredUserAuthToken);
@@ -38,7 +38,13 @@ test('unregisteredLogin', async () => {
 
 //POST /api/auth tests
 test('validRegister', async () => {
+  const registerRes = await request(app).post('/api/auth').send(unregisteredUser);
+  expect(registerRes.status).toBe(200);
+  expectValidJwt(registerRes.body.token);
   
+  const expectedUser = { ...unregisteredUser, roles: [{ role: 'diner' }] };
+  delete expectedUser.password;
+  expect(registerRes.body.user).toMatchObject(expectedUser);
 });
 
 //DELETE /api/auth tests
