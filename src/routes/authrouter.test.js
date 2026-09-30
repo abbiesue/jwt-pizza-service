@@ -49,5 +49,14 @@ test('validRegister', async () => {
 
 //DELETE /api/auth tests
 test('validLogout', async () => {
+  const logoutUser = {name: 'logout diner', email: Math.random().toString(36).substring(2, 12) + '@test.com', password: 'c'}
+  const registerRes = await request(app).post('/api/auth').send(logoutUser);
+  const token = registerRes.body.token;
 
+  const logoutRes = await request(app).delete('/api/auth').set('Authorization', `Bearer ${token}`);
+  expect(logoutRes.status).toBe(200);
+  expect(logoutRes.body.message).toBe("logout successful");
+
+  const meRes = await request(app).get('/api/user/me').set('Authorization', `Bearer ${token}`);
+  expect(meRes.status).toBe(401);
 });
