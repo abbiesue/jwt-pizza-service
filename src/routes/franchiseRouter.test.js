@@ -50,11 +50,26 @@ test('getFranchisesWithoutToken', async () => {
 });
  
 test('getFranchisesByName', async () => {
-
+    const getRes = await request(app).get('/api/franchise').query({ name: testFranchise.name });
+ 
+    expect(getRes.status).toBe(200);
+    expect(getRes.body.franchises).toHaveLength(1);
+    expect(getRes.body.franchises[0]).toMatchObject({ id: testFranchise.id, name: testFranchise.name });
+    expect(Array.isArray(getRes.body.franchises[0].stores)).toBe(true);
 });
  
 test('getFranchisesAsAdmin', async () => {
-
+    const getRes = await request(app)
+        .get('/api/franchise')
+        .query({ name: testFranchise.name })
+        .set('Authorization', `Bearer ${testAdmin.token}`);
+ 
+    expect(getRes.status).toBe(200);
+    expect(getRes.body.franchises).toHaveLength(1);
+    expect(getRes.body.franchises[0].admins).toEqual(
+        expect.arrayContaining([expect.objectContaining({ id: testFranchisee.id, email: testFranchisee.email })])
+    );
+    expect(Array.isArray(getRes.body.franchises[0].stores)).toBe(true);
 });
 
 //POST /api/franchise tests
