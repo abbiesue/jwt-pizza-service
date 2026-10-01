@@ -48,7 +48,14 @@ test('getMenu', async () => {
 
 //PUT /api/order/menu tests
 test('putAsAdmin', async () => {
+    const newItem = { title: randomName(), description: 'added by admin', image: 'pizza8.png', price: 0.0001 };
+    const addRes = await request(app)
+        .put('/api/order/menu')
+        .set('Authorization', `Bearer ${testAdmin.token}`)
+        .send(newItem);
 
+    expect(addRes.status).toBe(200);
+    expect(addRes.body.some((item) => item.title === newItem.title)).toBe(true);
 });
 
 test('putAsDiner', async () => {
