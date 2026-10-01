@@ -3,6 +3,10 @@ const app = require('../service');
 const { Role, DB } = require('../database/database.js');
 
 //global variables
+let testAdmin;
+let testFranchisee;
+let testFranchise;
+let testDiner;
 
 //helper functions
 async function createAdminUser() {
@@ -28,3 +32,22 @@ async function registerUser() {
     const registerRes = await request(app).post('/api/auth').send(user);
     return { ...registerRes.body.user, password: user.password, token: registerRes.body.token };
 }
+
+beforeAll(async () => {
+    testAdmin = await createAdminUser();
+    testDiner = await registerUser();
+    testFranchisee = await registerUser();
+    testFranchise = await DB.createFranchise({ name: randomName(), admins: [{ email: testFranchisee.email }] });
+});
+
+//GET /api/franchise tests
+
+//POST /api/franchise tests
+
+//GET /api/franchise/:userId tests
+
+//POST /api/franchise/:franchiseId/store tests
+
+//DELETE /api/franchise/:franchiseId/store/:storeId tests
+
+//DELETE /api/franchise/:franchiseId tests
