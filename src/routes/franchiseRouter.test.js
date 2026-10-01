@@ -121,11 +121,21 @@ test('postFranchiseUnknownAdmin', async () => {
 
 //GET /api/franchise/:userId tests
 test('getOwnFranchises', async () => {
-
+    const getRes = await request(app)
+        .get(`/api/franchise/${testFranchisee.id}`)
+        .set('Authorization', `Bearer ${testFranchisee.token}`);
+ 
+    expect(getRes.status).toBe(200);
+    expect(getRes.body).toEqual(expect.arrayContaining([expect.objectContaining({ id: testFranchise.id, name: testFranchise.name })]));
 });
  
 test('getUserFranchisesAsAdmin', async () => {
-    
+    const getRes = await request(app)
+        .get(`/api/franchise/${testFranchisee.id}`)
+        .set('Authorization', `Bearer ${testAdmin.token}`);
+ 
+    expect(getRes.status).toBe(200);
+    expect(getRes.body).toEqual(expect.arrayContaining([expect.objectContaining({ id: testFranchise.id })]));
 });
 
 //POST /api/franchise/:franchiseId/store tests
