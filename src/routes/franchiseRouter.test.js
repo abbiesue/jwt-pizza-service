@@ -100,11 +100,23 @@ test('validPostFranchise', async () => {
 });
  
 test('postFranchiseAsDiner', async () => {
-    
+    const postRes = await request(app)
+        .post('/api/franchise')
+        .set('Authorization', `Bearer ${testDiner.token}`)
+        .send({ name: randomName(), admins: [{ email: testDiner.email }] });
+ 
+    expect(postRes.status).toBe(403);
+    expect(postRes.body.message).toBe('unable to create a franchise');
 });
  
 test('postFranchiseUnknownAdmin', async () => {
-    
+    const postRes = await request(app)
+        .post('/api/franchise')
+        .set('Authorization', `Bearer ${testAdmin.token}`)
+        .send({ name: randomName(), admins: [{ email: randomEmail() }] });
+ 
+    expect(postRes.status).toBe(404);
+    expect(postRes.body.message).toContain('unknown user for franchise admin');
 });
 
 //GET /api/franchise/:userId tests
@@ -112,19 +124,7 @@ test('getOwnFranchises', async () => {
 
 });
  
-test('getOwnFranchisesWithNone', async () => {
-    
-});
- 
-test('getOtherUserFranchisesAsDiner', async () => {
-    
-});
- 
 test('getUserFranchisesAsAdmin', async () => {
-    
-});
- 
-test('getUserFranchisesWithoutToken', async () => {
     
 });
 
@@ -142,5 +142,15 @@ test('postStoreAsDiner', async () => {
 });
 
 //DELETE /api/franchise/:franchiseId/store/:storeId tests
+test('deleteStoreAsAdmin', async () => {
+
+});
+ 
+test('deleteStoreAsDiner', async () => {
+
+});
 
 //DELETE /api/franchise/:franchiseId tests
+test('validDeleteFranchise', async () => {
+
+});
