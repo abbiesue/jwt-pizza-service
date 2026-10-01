@@ -93,15 +93,20 @@ test('validPostOrder', async () => {
     expect(orderRes.body.order.id).toBeDefined();
 });
 
-test('invalidPostOrder', async () => {
-
-});
-
 //GET /api/order tests
 test('validGetOrders', async () => {
+    const ordersRes = await request(app).get('/api/order').set('Authorization', `Bearer ${testDiner.token}`);
 
+    expect(ordersRes.status).toBe(200);
+    expect(ordersRes.body.dinerId).toBe(testDiner.id);
+    expect(ordersRes.body.page).toBe(1);
+    expect(ordersRes.body.orders.length).toBeGreaterThan(0);
+    expect(ordersRes.body.orders[0].items[0]).toMatchObject({ menuId: testMenu.id, description: testMenu.title });
 });
 
 test('invalidGetOrders', async () => {
+    const ordersRes = await request(app).get('/api/order');
 
+    expect(ordersRes.status).toBe(401);
+    expect(ordersRes.body.message).toBe('unauthorized');
 });
