@@ -38,6 +38,10 @@ beforeAll(async () => {
     testMenu = await DB.addMenuItem({ title: randomName(), description: 'test pizza', image: 'pizza9.png', price: 0.05 });
 });
 
+afterEach(() => {
+    jest.restoreAllMocks();
+});
+
 //GET /api/order/menu tests
 test('getMenu', async () => {
     const getRes = await request(app).get('/api/order/menu');
@@ -71,7 +75,22 @@ test('putAsDiner', async () => {
 
 //POST /api/order tests
 test('validPostOrder', async () => {
+    jest.spyOn(global, 'fetch').mockResolvedValue({
+        ok: true,
+        json: async () => ({ jwt: 'factory.jwt.token', reportUrl: 'http://factory.test/report' }),
+    });
 
+    const orderReq = { franchiseId: 1, storeId: 1, items: [{ menuId: testMenu.id, description: testMenu.title, price: 0.05 }] };
+    const orderRes = await request(app)
+        .post('/api/order')
+        .set('Authorization', `Bearer ${testDiner.token}`)
+        .send(orderReq);
+
+    expect(orderRes.status).toBe(200);
+    expect(orderRes.body.jwt).toBe('factory.jwt.token');
+    expect(orderRes.body.followLinkToEndChaos).toBe('http://factory.test/report');
+    expect(orderRes.body.order).toMatchObject({ franchiseId: 1, storeId: 1 });
+    expect(orderRes.body.order.id).toBeDefined();
 });
 
 test('invalidPostOrder', async () => {
