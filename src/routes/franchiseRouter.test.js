@@ -7,6 +7,7 @@ let testAdmin;
 let testFranchisee;
 let testFranchise;
 let testDiner;
+const createdFranchiseIds = [];
 
 //helper functions
 async function createAdminUser() {
@@ -33,11 +34,23 @@ async function registerUser() {
     return { ...registerRes.body.user, password: user.password, token: registerRes.body.token };
 }
 
+async function createFranchise() {
+    const franchise = await DB.createFranchise({ name: randomName(), admins: [{ email: testFranchisee.email }] });
+    createdFranchiseIds.push(franchise.id);
+    return franchise;
+}
+
 beforeAll(async () => {
     testAdmin = await createAdminUser();
     testDiner = await registerUser();
     testFranchisee = await registerUser();
-    testFranchise = await DB.createFranchise({ name: randomName(), admins: [{ email: testFranchisee.email }] });
+    testFranchise = await createFranchise();
+});
+
+afterAll(async () => {
+    for (const id of createdFranchiseIds) {
+        await DB.deleteFranchise(id);
+    }
 });
 
 //GET /api/franchise tests
@@ -74,7 +87,16 @@ test('getFranchisesAsAdmin', async () => {
 
 //POST /api/franchise tests
 test('validPostFranchise', async () => {
-
+    const newFranchise = { name: randomName(), admins: [{ email: testFranchisee.email }] };
+    const postRes = await request(app)
+        .post('/api/franchise')
+        .set('Authorization', `Bearer ${testAdmin.token}`)
+        .send(newFranchise);
+ 
+    expect(postRes.status).toBe(200);
+    expect(postRes.body).toMatchObject({ name: newFranchise.name, admins: [{ email: testFranchisee.email, id: testFranchisee.id }] });
+    expect(postRes.body.id).toBeDefined();
+    createdFranchiseIds.push(postRes.body.id);
 });
  
 test('postFranchiseAsDiner', async () => {
