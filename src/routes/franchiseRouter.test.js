@@ -140,14 +140,35 @@ test('getUserFranchisesAsAdmin', async () => {
 
 //POST /api/franchise/:franchiseId/store tests
 test('postStoreAsAdmin', async () => {
-
+    const postRes = await request(app)
+        .post(`/api/franchise/${testFranchise.id}/store`)
+        .set('Authorization', `Bearer ${testAdmin.token}`)
+        .send({ name: randomName() });
+ 
+    expect(postRes.status).toBe(200);
+    expect(postRes.body).toMatchObject({ franchiseId: testFranchise.id });
+    expect(postRes.body.id).toBeDefined();
 });
  
 test('postStoreAsFranchisee', async () => {
-
+    const storeName = randomName();
+    const postRes = await request(app)
+        .post(`/api/franchise/${testFranchise.id}/store`)
+        .set('Authorization', `Bearer ${testFranchisee.token}`)
+        .send({ name: storeName });
+ 
+    expect(postRes.status).toBe(200);
+    expect(postRes.body).toMatchObject({ franchiseId: testFranchise.id, name: storeName });
 });
  
 test('postStoreAsDiner', async () => {
+    const postRes = await request(app)
+        .post(`/api/franchise/${testFranchise.id}/store`)
+        .set('Authorization', `Bearer ${testDiner.token}`)
+        .send({ name: randomName() });
+ 
+    expect(postRes.status).toBe(403);
+    expect(postRes.body.message).toBe('unable to create a store');
 
 });
 
