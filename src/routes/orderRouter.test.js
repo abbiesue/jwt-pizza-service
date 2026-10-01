@@ -59,7 +59,14 @@ test('putAsAdmin', async () => {
 });
 
 test('putAsDiner', async () => {
+    const newItem = { title: randomName(), description: 'added by diner', image: 'pizza8.png', price: 0.0001 };
+    const addRes = await request(app)
+        .put('/api/order/menu')
+        .set('Authorization', `Bearer ${testDiner.token}`)
+        .send(newItem);
 
+    expect(addRes.status).toBe(403);
+    expect(addRes.body.message).toBe('unable to add menu item');
 });
 
 //POST /api/order tests
