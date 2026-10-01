@@ -41,12 +41,64 @@ beforeAll(async () => {
 });
 
 //GET /api/franchise tests
+test('getFranchisesWithoutToken', async () => {
+
+});
+ 
+test('getFranchisesByName', async () => {
+
+});
+ 
+test('getFranchisesAsAdmin', async () => {
+
+});
 
 //POST /api/franchise tests
+test('validPostFranchise', async () => {
+
+});
+ 
+test('postFranchiseAsDiner', async () => {
+    
+});
+ 
+test('postFranchiseUnknownAdmin', async () => {
+    
+});
 
 //GET /api/franchise/:userId tests
+test('getOwnFranchises', async () => {
+
+});
+ 
+test('getOwnFranchisesWithNone', async () => {
+    
+});
+ 
+test('getOtherUserFranchisesAsDiner', async () => {
+    
+});
+ 
+test('getUserFranchisesAsAdmin', async () => {
+    
+});
+ 
+test('getUserFranchisesWithoutToken', async () => {
+    
+});
 
 //POST /api/franchise/:franchiseId/store tests
+test('postStoreAsAdmin', async () => {
+    
+});
+ 
+test('postStoreAsFranchisee', async () => {
+
+});
+ 
+test('postStoreAsDiner', async () => {
+
+});
 
 //DELETE /api/franchise/:franchiseId/store/:storeId tests
 
