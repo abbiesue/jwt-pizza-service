@@ -51,6 +51,24 @@ test('putAsAdmin', async () => {
 
 });
 
-//GET /api/order tests
+test('putAsDiner', async () => {
+
+});
 
 //POST /api/order tests
+test('validPostOrder', async () => {
+
+});
+
+test('invalidPostOrder', async () => {
+
+});
+
+//GET /api/order tests
+test('validGetOrders', async () => {
+
+});
+
+test('invalidGetOrders', async () => {
+
+});
