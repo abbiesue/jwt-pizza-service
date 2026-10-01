@@ -42,7 +42,11 @@ beforeAll(async () => {
 
 //GET /api/franchise tests
 test('getFranchisesWithoutToken', async () => {
-
+    const getRes = await request(app).get('/api/franchise');
+ 
+    expect(getRes.status).toBe(200);
+    expect(Array.isArray(getRes.body.franchises)).toBe(true);
+    expect(typeof getRes.body.more).toBe('boolean');
 });
  
 test('getFranchisesByName', async () => {
@@ -89,7 +93,7 @@ test('getUserFranchisesWithoutToken', async () => {
 
 //POST /api/franchise/:franchiseId/store tests
 test('postStoreAsAdmin', async () => {
-    
+
 });
  
 test('postStoreAsFranchisee', async () => {
