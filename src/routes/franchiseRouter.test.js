@@ -198,5 +198,12 @@ test('deleteStoreAsDiner', async () => {
 
 //DELETE /api/franchise/:franchiseId tests
 test('validDeleteFranchise', async () => {
-
+    const franchise = await createFranchise();
+    const deleteRes = await request(app).delete(`/api/franchise/${franchise.id}`);
+ 
+    expect(deleteRes.status).toBe(200);
+    expect(deleteRes.body.message).toBe('franchise deleted');
+ 
+    const getRes = await request(app).get('/api/franchise').query({ name: franchise.name });
+    expect(getRes.body.franchises).toHaveLength(0);
 });
