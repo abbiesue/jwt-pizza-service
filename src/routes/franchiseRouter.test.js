@@ -174,11 +174,26 @@ test('postStoreAsDiner', async () => {
 
 //DELETE /api/franchise/:franchiseId/store/:storeId tests
 test('deleteStoreAsAdmin', async () => {
-
+    const store = await DB.createStore(testFranchise.id, { name: randomName() });
+    const deleteRes = await request(app)
+        .delete(`/api/franchise/${testFranchise.id}/store/${store.id}`)
+        .set('Authorization', `Bearer ${testAdmin.token}`);
+ 
+    expect(deleteRes.status).toBe(200);
+    expect(deleteRes.body.message).toBe('store deleted');
+ 
+    const getRes = await request(app).get('/api/franchise').query({ name: testFranchise.name });
+    expect(getRes.body.franchises[0].stores.some((s) => s.id === store.id)).toBe(false);
 });
  
 test('deleteStoreAsDiner', async () => {
-
+    const store = await DB.createStore(testFranchise.id, { name: randomName() });
+    const deleteRes = await request(app)
+        .delete(`/api/franchise/${testFranchise.id}/store/${store.id}`)
+        .set('Authorization', `Bearer ${testDiner.token}`);
+ 
+    expect(deleteRes.status).toBe(403);
+    expect(deleteRes.body.message).toBe('unable to delete a store');
 });
 
 //DELETE /api/franchise/:franchiseId tests
