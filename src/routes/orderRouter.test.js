@@ -32,10 +32,6 @@ async function registerUser() {
     return { ...registerRes.body.user, password: user.password, token: registerRes.body.token };
 }
 
-function expectValidJwt(potentialJwt) {
-  expect(potentialJwt).toMatch(/^[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*$/);
-}
-
 beforeAll(async () => {
     testAdmin = await createAdminUser();
     testDiner = await registerUser();
@@ -43,8 +39,17 @@ beforeAll(async () => {
 });
 
 //GET /api/order/menu tests
+test('getMenu', async () => {
+    const getRes = await request(app).get('/api/order/menu');
+    expect(getRes.status).toBe(200);
+    expect(Array.isArray(getRes.body)).toBe(true);
+    expect(getRes.body.some((item) => item.id === testMenu.id)).toBe(true);
+});
 
 //PUT /api/order/menu tests
+test('putAsAdmin', async () => {
+
+});
 
 //GET /api/order tests
 
