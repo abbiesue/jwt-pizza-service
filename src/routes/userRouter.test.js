@@ -122,14 +122,21 @@ test("adminPutUser", async () => {
   });
 });
 
-test("list users unauthorized", async () => {
+test("list users no token", async () => {
   const listUsersRes = await request(app).get("/api/user");
   expect(listUsersRes.status).toBe(401);
 });
 
-test("list users", async () => {
+test("list users as diner", async () => {
   const listUsersRes = await request(app)
     .get("/api/user")
     .set("Authorization", "Bearer " + testDiner.token);
+  expect(listUsersRes.status).toBe(403);
+});
+
+test("list users as admin", async () => {
+  const listUsersRes = await request(app)
+    .get("/api/user")
+    .set("Authorization", "Bearer " + testAdmin.token);
   expect(listUsersRes.status).toBe(200);
 });
