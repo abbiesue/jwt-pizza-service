@@ -166,3 +166,17 @@ test("list users paginated", async () => {
   expect(page1.body.users).toHaveLength(1);
   expect(page1.body.users[0].id).not.toBe(page0.body.users[0].id);
 });
+
+test("delete user without token", async () => {
+  const deleteRes = await request(app).delete(
+    `/api/user/${secondTestDiner.id}`,
+  );
+  expect(deleteRes.status).toBe(401);
+});
+
+test("delete user as diner", async () => {
+  const deleteRes = await request(app)
+    .delete(`/api/user/${secondTestDiner.id}`)
+    .set("Authorization", "Bearer " + testDiner.token);
+  expect(deleteRes.status).toBe(403);
+});
