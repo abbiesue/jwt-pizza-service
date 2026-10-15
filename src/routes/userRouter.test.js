@@ -199,3 +199,16 @@ test("delete user as admin", async () => {
     .set("Authorization", "Bearer " + testAdmin.token);
   expect(listRes.body.users).toHaveLength(0);
 });
+
+test("deleted user's token no longer works", async () => {
+  const victim = await registerUser();
+
+  await request(app)
+    .delete(`/api/user/${victim.id}`)
+    .set("Authorization", "Bearer " + testAdmin.token);
+
+  const meRes = await request(app)
+    .get("/api/user/me")
+    .set("Authorization", "Bearer " + victim.token);
+  expect(meRes.status).toBe(401);
+});
