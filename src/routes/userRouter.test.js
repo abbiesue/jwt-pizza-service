@@ -151,3 +151,18 @@ test("list users as admin", async () => {
     expect(user).not.toHaveProperty("password");
   }
 });
+
+test("list users paginated", async () => {
+  const page0 = await request(app)
+    .get("/api/user?page=0&limit=1")
+    .set("Authorization", "Bearer " + testAdmin.token);
+  expect(page0.status).toBe(200);
+  expect(page0.body.users).toHaveLength(1);
+  expect(page0.body.more).toBe(true);
+
+  const page1 = await request(app)
+    .get("/api/user?page=1&limit=1")
+    .set("Authorization", "Bearer " + testAdmin.token);
+  expect(page1.body.users).toHaveLength(1);
+  expect(page1.body.users[0].id).not.toBe(page0.body.users[0].id);
+});
