@@ -180,3 +180,22 @@ test("delete user as diner", async () => {
     .set("Authorization", "Bearer " + testDiner.token);
   expect(deleteRes.status).toBe(403);
 });
+
+test("delete user as admin", async () => {
+  const victim = await registerUser();
+
+  const deleteRes = await request(app)
+    .delete(`/api/user/${victim.id}`)
+    .set("Authorization", "Bearer " + testAdmin.token);
+  expect(deleteRes.status).toBe(200);
+
+  const loginRes = await request(app)
+    .put("/api/auth")
+    .send({ email: victim.email, password: victim.password });
+  expect(loginRes.status).toBe(404);
+
+  const listRes = await request(app)
+    .get(`/api/user?name=${victim.name}`)
+    .set("Authorization", "Bearer " + testAdmin.token);
+  expect(listRes.body.users).toHaveLength(0);
+});
