@@ -136,7 +136,7 @@ test("list users as diner", async () => {
 
 test("list users as admin", async () => {
   const listUsersRes = await request(app)
-    .get("/api/user")
+    .get(`/api/user?name=${secondTestDiner.name}`)
     .set("Authorization", "Bearer " + testAdmin.token);
   expect(listUsersRes.status).toBe(200);
 

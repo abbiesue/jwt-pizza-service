@@ -107,13 +107,21 @@ class DB {
     }
   }
 
-  async getUsers() {
+  async getUsers(page = 0, limit = 10, nameFilter = "*") {
     const connection = await this.getConnection();
     try {
-      const users = await this.query(
+      const offset = page * limit;
+      nameFilter = nameFilter.replace(/\*/g, "%");
+      let users = await this.query(
         connection,
-        `SELECT id, name, email FROM user`,
+        `SELECT id, name, email FROM user WHERE name LIKE ? ORDER BY id LIMIT ${limit + 1} OFFSET ${offset}`,
+        [nameFilter],
       );
+
+      const more = users.length > limit;
+      if (more) {
+        users = users.slice(0, limit);
+      }
 
       for (const user of users) {
         const roleResult = await this.query(
@@ -126,7 +134,7 @@ class DB {
         });
       }
 
-      return [users, false];
+      return [users, more];
     } finally {
       connection.end();
     }
