@@ -139,4 +139,15 @@ test("list users as admin", async () => {
     .get("/api/user")
     .set("Authorization", "Bearer " + testAdmin.token);
   expect(listUsersRes.status).toBe(200);
+
+  expect(listUsersRes.body.users).toBeInstanceOf(Array);
+  const diner = listUsersRes.body.users.find(
+    (u) => u.email === secondTestDiner.email,
+  );
+  expect(diner).toBeDefined();
+  expect(diner.name).toBe(secondTestDiner.name);
+  expect(diner.roles).toEqual([{ role: "diner" }]);
+  for (const user of listUsersRes.body.users) {
+    expect(user).not.toHaveProperty("password");
+  }
 });
