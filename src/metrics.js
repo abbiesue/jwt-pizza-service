@@ -1,5 +1,38 @@
 const config = require("./config");
 
+//Metrics storage
+let getRequestsCount = 0;
+let postRequestsCount = 0;
+let putRequestsCount = 0;
+let deleteRequestsCount = 0;
+let totalRequestsCount = 0;
+
+//HTTP Request metrics
+function requestTracker(req, res, next) {
+  updateMethodCounts(req.method);
+  totalRequestsCount++;
+  next();
+}
+
+function updateMethodCounts(method) {
+  switch (method) {
+    case "GET":
+      getRequestsCount++;
+      break;
+    case "POST":
+      postRequestsCount++;
+      break;
+    case "PUT":
+      putRequestsCount++;
+      break;
+    case "DELETE":
+      deleteRequestsCount++;
+      break;
+    default:
+      break;
+  }
+}
+
 function createMetric(
   metricName,
   metricValue,
@@ -70,3 +103,5 @@ function sendMetricToGrafana(metrics) {
       console.error("Error pushing metrics:", error);
     });
 }
+
+module.exports = { requestTracker };
