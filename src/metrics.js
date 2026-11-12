@@ -8,6 +8,13 @@ let putRequestsCount = 0;
 let deleteRequestsCount = 0;
 let totalRequestsCount = 0;
 
+let pizzasSoldCount = 0;
+let creationFailuresCount = 0;
+let revenueGenerated = 0;
+let pizzaCreationLatencySum = 0;
+let pizzaCreationLatencyCount = 0;
+let pizzaCreationLatencyAverage = 0;
+
 //HTTP Request metrics
 function requestTracker(req, res, next) {
   updateMethodCounts(req.method);
@@ -46,6 +53,18 @@ function getMemoryUsagePercentage() {
   const usedMemory = totalMemory - freeMemory;
   const memoryUsage = (usedMemory / totalMemory) * 100;
   return Number(memoryUsage.toFixed(2));
+}
+
+//Purchase metrics
+function logPizzaPurchase(success, latency, price, pizzaCount) {
+  if (success) {
+    pizzasSoldCount += pizzaCount;
+    revenueGenerated += price;
+  } else {
+    creationFailuresCount++;
+  }
+  pizzaCreationLatencySum += latency;
+  pizzaCreationLatencyCount++;
 }
 
 function createMetric(
@@ -119,4 +138,4 @@ function sendMetricToGrafana(metrics) {
     });
 }
 
-module.exports = { requestTracker };
+module.exports = { requestTracker, logPizzaPurchase };
