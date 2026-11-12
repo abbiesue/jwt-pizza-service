@@ -15,10 +15,18 @@ let pizzaCreationLatencySum = 0;
 let pizzaCreationLatencyCount = 0;
 let pizzaCreationLatencyAverage = 0;
 
+const activeUsers = new Map();
+
+let successfulLoginsCount = 0;
+let failedLoginsCount = 0;
+
 //HTTP Request metrics
 function requestTracker(req, res, next) {
   updateMethodCounts(req.method);
   totalRequestsCount++;
+  if (req.user) {
+    logUserActivity(req.user.id);
+  }
   next();
 }
 
@@ -65,6 +73,31 @@ function logPizzaPurchase(success, latency, price, pizzaCount) {
   }
   pizzaCreationLatencySum += latency;
   pizzaCreationLatencyCount++;
+}
+
+//Active user metrics
+function logUserActivity(userId) {
+  const currentTime = Date.now();
+  activeUsers.set(userId, currentTime);
+}
+
+function getActiveUserCount() {
+  const currentTime = Date.now();
+  for (const [userId, lastActivityTime] of activeUsers.entries()) {
+    if (currentTime - lastActivityTime > 5 * 60 * 1000) {
+      activeUsers.delete(userId);
+    }
+  }
+  return activeUsers.size;
+}
+
+//Login metrics
+function logLoginAttempt(success) {
+  if (success) {
+    successfulLoginsCount++;
+  } else {
+    failedLoginsCount++;
+  }
 }
 
 function createMetric(
@@ -138,4 +171,9 @@ function sendMetricToGrafana(metrics) {
     });
 }
 
-module.exports = { requestTracker, logPizzaPurchase };
+module.exports = {
+  requestTracker,
+  logPizzaPurchase,
+  logUserActivity,
+  logLoginAttempt,
+};
