@@ -20,8 +20,17 @@ const activeUsers = new Map();
 let successfulLoginsCount = 0;
 let failedLoginsCount = 0;
 
+let endpointLatencySum = 0;
+let endpointLatencyCount = 0;
+
 //HTTP Request metrics
 function requestTracker(req, res, next) {
+  const latencyStart = Date.now();
+  res.on("finish", () => {
+    const latency = Date.now() - latencyStart;
+    endpointLatencySum += latency;
+    endpointLatencyCount++;
+  });
   updateMethodCounts(req.method);
   totalRequestsCount++;
   if (req.user) {
