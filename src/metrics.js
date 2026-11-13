@@ -1,4 +1,3 @@
-const { send } = require("process");
 const config = require("./config");
 const os = require("os");
 
@@ -273,18 +272,6 @@ function createMetric(
   return metric;
 }
 
-function sendMetricsPeriodically(period) {
-  const timer = setInterval(() => {
-    timer.unref();
-    try {
-      const metrics = buildMetrics();
-      sendMetricToGrafana(metrics);
-    } catch (error) {
-      console.log("Error sending metrics", error);
-    }
-  }, period);
-}
-
 function sendMetricToGrafana(metrics) {
   const body = {
     resourceMetrics: [
@@ -314,6 +301,18 @@ function sendMetricToGrafana(metrics) {
     .catch((error) => {
       console.error("Error pushing metrics:", error);
     });
+}
+
+function sendMetricsPeriodically(period) {
+  const timer = setInterval(() => {
+    try {
+      const metrics = buildMetrics();
+      sendMetricToGrafana(metrics);
+    } catch (error) {
+      console.log("Error sending metrics", error);
+    }
+  }, period);
+  timer.unref();
 }
 
 module.exports = {
