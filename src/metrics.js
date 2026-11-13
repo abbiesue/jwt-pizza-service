@@ -115,6 +115,123 @@ function averageLatency(latency) {
   return latencyAverage;
 }
 
+function buildMetrics() {
+  const metrics = [];
+
+  //HTTP requests
+  metrics.push(
+    createMetric("http_requests", totalRequestsCount, "1", "sum", "asInt", {
+      method: "ALL",
+    }),
+  );
+  metrics.push(
+    createMetric("http_requests", getRequestsCount, "1", "sum", "asInt", {
+      method: "GET",
+    }),
+  );
+  metrics.push(
+    createMetric("http_requests", postRequestsCount, "1", "sum", "asInt", {
+      method: "POST",
+    }),
+  );
+  metrics.push(
+    createMetric("http_requests", putRequestsCount, "1", "sum", "asInt", {
+      method: "PUT",
+    }),
+  );
+  metrics.push(
+    createMetric("http_requests", deleteRequestsCount, "1", "sum", "asInt", {
+      method: "DELETE",
+    }),
+  );
+
+  //Users and auth
+  metrics.push(
+    createMetric(
+      "active_users",
+      getActiveUserCount(),
+      "1",
+      "gauge",
+      "asInt",
+      {},
+    ),
+  );
+  metrics.push(
+    createMetric("auth_attempts", successfulLoginsCount, "1", "sum", "asInt", {
+      status: "success",
+    }),
+  );
+  metrics.push(
+    createMetric("auth_attempts", failedLoginsCount, "1", "sum", "asInt", {
+      status: "failure",
+    }),
+  );
+
+  //System
+  metrics.push(
+    createMetric(
+      "cpu_usage",
+      getCpuUsagePercentage(),
+      "%",
+      "gauge",
+      "asDouble",
+      {},
+    ),
+  );
+  metrics.push(
+    createMetric(
+      "memory_usage",
+      getMemoryUsagePercentage(),
+      "%",
+      "gauge",
+      "asDouble",
+      {},
+    ),
+  );
+
+  //Pizzas
+  metrics.push(
+    createMetric("pizzas_sold", pizzasSoldCount, "1", "sum", "asInt", {}),
+  );
+  metrics.push(
+    createMetric(
+      "pizza_creation_failures",
+      creationFailuresCount,
+      "1",
+      "sum",
+      "asInt",
+      {},
+    ),
+  );
+  metrics.push(
+    createMetric("revenue", revenueGenerated, "1", "sum", "asDouble", {}),
+  );
+
+  //Latency (averaged over this period, then reset)
+  metrics.push(
+    createMetric(
+      "endpoint_latency",
+      averageLatency(endpointLatency),
+      "ms",
+      "gauge",
+      "asDouble",
+      {},
+    ),
+  );
+  metrics.push(
+    createMetric(
+      "pizza_creation_latency",
+      averageLatency(pizzaCreationLatency),
+      "ms",
+      "gauge",
+      "asDouble",
+      {},
+    ),
+  );
+
+  return metrics;
+}
+
 function createMetric(
   metricName,
   metricValue,
