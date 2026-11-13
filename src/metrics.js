@@ -11,25 +11,22 @@ let totalRequestsCount = 0;
 let pizzasSoldCount = 0;
 let creationFailuresCount = 0;
 let revenueGenerated = 0;
-let pizzaCreationLatencySum = 0;
-let pizzaCreationLatencyCount = 0;
-let pizzaCreationLatencyAverage = 0;
+const pizzaCreationLatency = { sum: 0, count: 0 };
 
 const activeUsers = new Map();
 
 let successfulLoginsCount = 0;
 let failedLoginsCount = 0;
 
-let endpointLatencySum = 0;
-let endpointLatencyCount = 0;
+const endpointLatency = { sum: 0, count: 0 };
 
 //HTTP Request metrics
 function requestTracker(req, res, next) {
   const latencyStart = Date.now();
   res.on("finish", () => {
     const latency = Date.now() - latencyStart;
-    endpointLatencySum += latency;
-    endpointLatencyCount++;
+    endpointLatency.sum += latency;
+    endpointLatency.count++;
   });
   updateMethodCounts(req.method);
   totalRequestsCount++;
@@ -80,8 +77,8 @@ function logPizzaPurchase(success, latency, price, pizzaCount) {
   } else {
     creationFailuresCount++;
   }
-  pizzaCreationLatencySum += latency;
-  pizzaCreationLatencyCount++;
+  pizzaCreationLatency.sum += latency;
+  pizzaCreationLatency.count++;
 }
 
 //Active user metrics
@@ -107,6 +104,15 @@ function logLoginAttempt(success) {
   } else {
     failedLoginsCount++;
   }
+}
+
+//Latency averaging
+function averageLatency(latency) {
+  if (latency.count === 0) return 0;
+  const latencyAverage = latency.sum / latency.count;
+  latency.sum = 0;
+  latency.count = 0;
+  return latencyAverage;
 }
 
 function createMetric(
